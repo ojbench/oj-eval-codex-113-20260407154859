@@ -31,6 +31,10 @@ from datetime import datetime
 class ACMOJClient:
     def __init__(self, access_token: str):
         self.api_base = "https://acm.sjtu.edu.cn/OnlineJudge/api/v1"
+        # Ensure no proxies interfere with ACMOJ HTTPS
+        os.environ.setdefault("NO_PROXY", "acm.sjtu.edu.cn")
+        os.environ.setdefault("no_proxy", "acm.sjtu.edu.cn")
+
         self.headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/x-www-form-urlencoded",
@@ -89,6 +93,13 @@ class ACMOJClient:
         if result and 'id' in result:
             self._save_submission_id(result['id'])
 
+        return result
+
+    def submit_code(self, problem_id: int, language: str, code_text: str) -> Optional[Dict]:
+        data = {"language": language, "code": code_text}
+        result = self._make_request("POST", f"/problem/{problem_id}/submit", data=data)
+        if result and 'id' in result:
+            self._save_submission_id(result['id'])
         return result
 
     def get_submission_detail(self, submission_id: int) -> Optional[Dict]:
