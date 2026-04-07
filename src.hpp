@@ -37,7 +37,7 @@ public:
         }
     }
 
-    ~LinkedList() {
+    virtual ~LinkedList() {
         Node* cur = head_;
         while (cur) {
             Node* nx = cur->next;
@@ -46,6 +46,26 @@ public:
         }
         head_ = tail_ = NULL;
         size_ = 0;
+    }
+
+    LinkedList& operator=(const LinkedList& other) {
+        if (this == &other) return *this;
+        // Clear current list
+        Node* cur = head_;
+        while (cur) {
+            Node* nx = cur->next;
+            delete cur;
+            cur = nx;
+        }
+        head_ = tail_ = NULL;
+        size_ = 0;
+        // Deep copy from other
+        Node* o = other.head_;
+        while (o) {
+            pushBack(o->val);
+            o = o->next;
+        }
+        return *this;
     }
 
     // Basic operations
@@ -120,4 +140,3 @@ public:
     T pop() /*override*/ { return this->popFront(); }
     void push(T val) /*override*/ { this->pushBack(val); }
 };
-
